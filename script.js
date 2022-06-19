@@ -6,6 +6,8 @@ const shield1Args = require('./calldata/shield1.json');
 const shield2Args = require('./calldata/shield2.json');
 const transferArgs = require('./calldata/transfer.json');
 const unshieldArgs = require('./calldata/unshield.json');
+const sellArgs = require('./calldata/sell.json');
+
 const { ethers } = require("hardhat");
 
 async function main() {
@@ -64,6 +66,11 @@ console.log(mint1Args)
   console.log("signer2");
   console.log(signer2.address);
   console.log();
+
+  console.log("Sell token 2");
+  await zkCards.sell(...sellArgs);
+  await printOwnerOf(sellArgs[3][3]);
+
 }
 
 main()

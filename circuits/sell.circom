@@ -14,9 +14,9 @@ template sell(levels) {
     signal input pubKeyReceiver;
     signal input pathElements[levels];
     signal input pathIndices[levels];
-    signal input attribute0;
     signal input attribute1;
     signal input attribute2;
+    signal input attribute3;
     signal input hashKey;
     signal output nullifier;
     signal output newCommitment;
@@ -37,12 +37,14 @@ template sell(levels) {
     tree.root <== root;
 
 
+    component genPubKeyOriginal = Poseidon(1);
+    genPubKeyOriginal.inputs[0] <== hashKey;
     
     component mimc = MiMCSponge(4, 220, 1);
-    mimc.ins[0] <== attribute0;
-    mimc.ins[1] <== attribute1;
-    mimc.ins[2] <== attribute2;
-    mimc.ins[3] <== hashKey;
+    mimc.ins[0] <== attribute1;
+    mimc.ins[1] <== attribute2;
+    mimc.ins[2] <== attribute3;
+    mimc.ins[3] <== genPubKeyOriginal.out;
 
     mimc.k <== 0;
 
@@ -50,9 +52,9 @@ template sell(levels) {
 
     component mimc_new= MiMCSponge(4, 220, 1);
 
-    mimc_new.ins[0] <== attribute0;
-    mimc_new.ins[1] <== attribute1;
-    mimc_new.ins[2] <== attribute2;
+    mimc_new.ins[0] <== attribute1;
+    mimc_new.ins[1] <== attribute2;
+    mimc_new.ins[2] <== attribute3;
     mimc_new.ins[3] <== pubKeyReceiver;
 
     mimc_new.k <== 0;
@@ -70,4 +72,4 @@ template sell(levels) {
 }
 
 
-component main {public [root, pubKeyReceiver, attribute0, attribute1, attribute2]}= sell(2);
+component main {public [root, pubKeyReceiver, attribute1, attribute2, attribute3]}= sell(2);

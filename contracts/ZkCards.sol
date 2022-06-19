@@ -35,7 +35,14 @@ interface IVerifier {
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[3] memory input
+        uint256[4] memory input
+    ) external returns (bool);
+
+    function verifySellProof(
+        uint256[2] memory a,
+        uint256[2][2] memory b,
+        uint256[2] memory c,
+        uint256[7] memory input
     ) external returns (bool);
 }
 
@@ -161,11 +168,12 @@ contract ZkCards is MerkleTreeWithHistory {
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[3] memory input
+        uint256[4] memory input
     ) public {
         uint256 nullifier = input[0];
         uint256 newCommitment = input[1];
         uint256 root = input[2];
+        uint256 pubKey = input[3];
 
         require(!nullifiers[nullifier], "Nullifier was already used");
 
@@ -187,13 +195,15 @@ contract ZkCards is MerkleTreeWithHistory {
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[4] memory input
+        uint256[7] memory input
     ) public {
         uint256 nullifier = input[0];
         uint256 newCommitment = input[1];
         uint256 root = input[2];
         uint256 pubKeyReceiver = input[3];
-
+        uint256 attribute1 = input[4];
+        uint256 attribute2 = input[5];
+        uint256 attribute3 = input[6];
         // Check that pubKeyReceiver has made an ask and that the has not been matched yet.
 
 
@@ -202,12 +212,12 @@ contract ZkCards is MerkleTreeWithHistory {
 
         require(isKnownRoot(bytes32(root)), "Cannot find your merkle root");
 
-        // Verify that the seller has indeed made a shielded transfer to pubKeyReceiver and that the conditions
-        // of the sell are satisfied.
-       // require(
-           // verifier.verifyTransferProof(a, b, c, input),
-        //    "Invalid unshield proof"
-       // );
+         //Verify that the seller has indeed made a shielded transfer to pubKeyReceiver and that the conditions
+         //of the sell are satisfied.
+        require(
+            verifier.verifySellProof(a, b, c, input),
+            "Invalid unshield proof"
+        );
 
         nullifiers[nullifier] = true;
         require(!commitments[newCommitment], "Commitment already exists");

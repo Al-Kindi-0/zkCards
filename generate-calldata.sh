@@ -23,3 +23,4 @@ generate-calldata transfer ""
 generate-calldata unshield ""
 generate-calldata mint 1
 generate-calldata mint 2
+generate-calldata sell ""

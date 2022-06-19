@@ -3,17 +3,18 @@ pragma circom 2.0.0;
 include "../node_modules/circomlib/circuits/comparators.circom";
 include "../node_modules/circomlib/circuits/gates.circom";
 include "../node_modules/circomlib/circuits/mimcsponge.circom";
+include "../node_modules/circomlib/circuits/poseidon.circom";
 
 template hashCharacter() {
     signal input attribute[3];
-    signal input hashKey;
+    signal input pubKey;
     signal output out;
 
     component mimc = MiMCSponge(4, 220, 1);
     mimc.ins[0] <== attribute[0];
     mimc.ins[1] <== attribute[1];
     mimc.ins[2] <== attribute[2];
-    mimc.ins[3] <== hashKey;
+    mimc.ins[3] <== pubKey;
 
     mimc.k <== 0;
 
@@ -54,11 +55,14 @@ template mint(TOTAL) {
 
     sum_total.out === 1;
 
+    component genPubKey = Poseidon(1);
+    genPubKey.inputs[0] <== hashKey;
+
     component cHash = hashCharacter();
     cHash.attribute[0] <== attribute1;
     cHash.attribute[1] <== attribute2;
     cHash.attribute[2] <== attribute3;
-    cHash.hashKey <== hashKey;
+    cHash.pubKey <== genPubKey.out;
 
     out <== cHash.out;
 }

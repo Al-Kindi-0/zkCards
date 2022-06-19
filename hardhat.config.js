@@ -22,8 +22,7 @@ module.exports = {
   circom: {
     ptau: "pot15_final.ptau",
     circuits: 
-    //[{name: "mint"}, { name: "unshield" }, 
-    //[{ name: "transfer" }]
-    [{ name: "mint" }]
+    //[{name: "mint"}, { name: "unshield" },{ name: "transfer" },{name: "shield"}]
+    [{ name: "sell" }]
   }
 };

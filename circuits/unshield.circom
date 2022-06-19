@@ -39,4 +39,4 @@ template unshield(levels) {
 }
 
 
-component main {public [id, address, root]}= unshield(2);
+component main {public [id, address, root]}= unshield(3);

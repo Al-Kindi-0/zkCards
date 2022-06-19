@@ -10,7 +10,6 @@ template sell(levels) {
     signal input id;
     signal input root;
     signal input secret;
-    //signal input newSecret;
     signal input pubKeyReceiver;
     signal input pathElements[levels];
     signal input pathIndices[levels];
@@ -72,4 +71,4 @@ template sell(levels) {
 }
 
 
-component main {public [root, pubKeyReceiver, attribute1, attribute2, attribute3]}= sell(2);
+component main {public [root, pubKeyReceiver, attribute1, attribute2, attribute3]}= sell(3);

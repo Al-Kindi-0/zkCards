@@ -44,4 +44,4 @@ template transfer(levels) {
 }
 
 
-component main {public [root, pubKeyReceiver]}= transfer(2);
+component main {public [root]}= transfer(3);

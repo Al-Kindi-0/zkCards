@@ -17,9 +17,11 @@ generate-calldata() {
   echo -n ']' >> calldata/${1}${2}.json
 }
 
+generate-calldata unshield 2
 generate-calldata shield 1
 generate-calldata shield 2
 generate-calldata transfer ""
+generate-calldata transfer 2
 generate-calldata unshield ""
 generate-calldata mint 1
 generate-calldata mint 2

@@ -11,7 +11,7 @@ const { BigNumber, BigNumberish, ethers } = require("ethers");
 const circuitsDir = path.resolve(__dirname, "circuits");
 
 async function main() {
-  const tree = new Tree(2);
+  const tree = new Tree(3);
   //console.log(poseidon([1,2,0,0,0]));
   //console.log(tree)
 
@@ -20,7 +20,7 @@ async function main() {
     "attribute1": 2,
     "attribute2": 4,
     "attribute3": 1,
-    "hashKey": 88
+    "hashKey": 85
   };
   fs.writeJsonSync(path.resolve(circuitsDir, "mint1.input.json"), card1);
 
@@ -80,8 +80,8 @@ async function main() {
 
   let newSecret = 21;
   let pubKeyReceiver = poseidon([newSecret]).toString();
-  console.log("pubkey");
-  console.log(pubKeyReceiver)
+  //console.log("pubkey");
+  //console.log(pubKeyReceiver)
   const transfer = {
     id: hashedId1,
     root: tree.root(),
@@ -100,7 +100,8 @@ async function main() {
     //transfer.newSecret
     pubKeyReceiver
   ]).toString();
-  tree.insert(newCommitment)
+  tree.insert(newCommitment);
+  console.log(newCommitment);
   fs.writeJsonSync(path.resolve(circuitsDir, "transfer.input.json"), transfer);
 
   //console.log(tree);
@@ -120,12 +121,14 @@ async function main() {
 
 
 
+  let secret2 = 93984;
+  let pubKeyReceiver2 = poseidon([secret2]).toString();
   // Sell "card2"
   const sell = {
     id: shield2.id,
     root: tree.root(),
     secret: shield2.secret,
-    pubKeyReceiver: pubKey1,
+    pubKeyReceiver: pubKeyReceiver2,
     pathElements: tree.path(1).pathElements.map(x => x.toString()),
     pathIndices: tree.path(1).pathIndices.map(x => x.toString()),
     attribute1: 2,
@@ -140,14 +143,52 @@ async function main() {
 
   let sellCommitment = poseidon([
     newId,
-    pubKeyReceiver
+    sell.pubKeyReceiver
   ]).toString();
   tree.insert(sellCommitment)
+  console.log(sellCommitment);
   fs.writeJsonSync(path.resolve(circuitsDir, "sell.input.json"), sell);
-  console.log("ff")
+
+  // Shielded transfer of shielded "card1"
+  // Generate private/public keypair for the receiver
+
+  let secret3 = 3393984;
+  let pubKeyReceiver3 = poseidon([secret3]).toString();
+  console.log("pubkey");
+  console.log(pubKeyReceiver)
+  const transfer2 = {
+    id: newId,
+    root: tree.root(),
+    secret: secret2,
+    pubKeyReceiver: pubKeyReceiver3,
+    pathElements: tree.path(3).pathElements.map(x => x.toString()),
+    pathIndices: tree.path(3).pathIndices.map(x => x.toString()),
+  };
+  console.log(mimcsponge.multiHash([transfer2.id,transfer2.secret]).toString());
+
+  // New note refering to "card2" but with a new owner/pubKey this time
+  newCommitment = poseidon([
+    transfer2.id,
+    //transfer.newSecret
+    pubKeyReceiver3
+  ]).toString();
+  tree.insert(newCommitment)
+  fs.writeJsonSync(path.resolve(circuitsDir, "transfer2.input.json"), transfer2);
 
 
-
+// Unshield the note
+const unshield2 = {
+  id: transfer2.id,
+  // address is second hardhat address in decimal
+  address: "642829559307850963015472508762062935916233390536",
+  root: tree.root(),
+  secret: secret3,
+  pathElements: tree.path(4).pathElements.map(x => x.toString()),
+  pathIndices: tree.path(4).pathIndices.map(x => x.toString()),
+};
+  console.log(mimcsponge.multiHash([unshield2.id, unshield2.secret]).toString());
+fs.writeJsonSync(path.resolve(circuitsDir, "unshield2.input.json"), unshield2);
+fs.writeJsonSync(path.resolve(circuitsDir, "unshield2.json"), unshield2);
 
 
 }

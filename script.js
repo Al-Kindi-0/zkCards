@@ -7,6 +7,9 @@ const shield2Args = require('./calldata/shield2.json');
 const transferArgs = require('./calldata/transfer.json');
 const unshieldArgs = require('./calldata/unshield.json');
 const sellArgs = require('./calldata/sell.json');
+const transfer2Args = require('./calldata/transfer2.json');
+const unshield2Args = require('./calldata/unshield2.json');
+
 
 const { ethers } = require("hardhat");
 
@@ -25,7 +28,7 @@ async function main() {
 
   const ZkCards = await ethers.getContractFactory("ZkCards");
   //const zkCards = await ZkCards.deploy(verifier.address, mintVerifier.address, 2, hasher.address);
-  const zkCards = await ZkCards.deploy(verifier.address,  2, hasher.address);
+  const zkCards = await ZkCards.deploy(verifier.address,  3, hasher.address);
   await zkCards.deployed();
 
   console.log("Contract:", zkCards.address);
@@ -57,10 +60,12 @@ console.log(mint1Args)
   console.log();
 
   console.log("Transfer");
+  console.log(transferArgs[3][0])
   await zkCards.transfer(...transferArgs);
   console.log();
 
   console.log("Unshield token 1");
+  console.log(unshieldArgs[3][0])
   await zkCards.connect(signer2).unshield(...unshieldArgs);
   await printOwnerOf(unshieldArgs[3][1]);
   console.log("signer2");
@@ -68,8 +73,22 @@ console.log(mint1Args)
   console.log();
 
   console.log("Sell token 2");
+  console.log(sellArgs[3][0]);
   await zkCards.sell(...sellArgs);
   await printOwnerOf(sellArgs[3][3]);
+
+  console.log("Transfer2");
+  console.log(transfer2Args[3][0]);
+  await zkCards.transfer(...transfer2Args);
+  console.log();
+
+  console.log("Unshield token 2");
+  console.log(unshield2Args[3][0]);
+  await zkCards.connect(signer2).unshield(...unshield2Args);
+  await printOwnerOf(unshield2Args[3][1]);
+  console.log("signer2");
+  console.log(signer2.address);
+  console.log();
 
 }
 

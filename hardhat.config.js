@@ -23,6 +23,6 @@ module.exports = {
     ptau: "pot15_final.ptau",
     circuits: 
     [{name: "mint"}, { name: "unshield" },{ name: "transfer" },{name: "shield"},{name: "sell"}]
-    //[{ name: "sell" }]
+    //[{ name: "transfer" }]
   }
 };

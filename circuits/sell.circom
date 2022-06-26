@@ -17,6 +17,7 @@ template sell(levels) {
     signal input attribute2;
     signal input attribute3;
     signal input hashKey;
+    // TODO: signal input ownAddress; // Needed to stop front-running 
     signal output nullifier;
     signal output newCommitment;
 

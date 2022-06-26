@@ -1,5 +1,8 @@
 require("@nomiclabs/hardhat-waffle");
 require("hardhat-circom");
+const dotenv = require("dotenv");
+dotenv.config();
+require("@nomiclabs/hardhat-etherscan");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -18,11 +21,24 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.0",
+  solidity: {
+    compilers: [{ version: "0.7.6" },{ version: "0.8.15" }, { version: "0.6.7" }]
+  },
   circom: {
     ptau: "pot15_final.ptau",
-    circuits: 
-    [{name: "mint"}, { name: "unshield" },{ name: "transfer" },{name: "shield"},{name: "sell"}]
+    circuits:
+      [{ name: "mint" }, { name: "unshield" }, { name: "transfer" }, { name: "shield" }, { name: "sell" }]
     //[{ name: "transfer" }]
+  }, 
+  
+  networks: {
+    goerli: {
+    url: process.env.REACT_APP_GO_RPC_URL,
+    accounts: [process.env.REACT_APP_PRIVAT_KEY]
+    }
+  },
+  etherscan: {
+    apiKey: process.env.REACT_APP_ETH_SCAN_URL,
   }
+
 };

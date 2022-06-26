@@ -1,7 +1,7 @@
-pragma solidity ^0.8.0;
+pragma solidity 0.8.15;
 
 import "./MerkleTreeWithHistory.sol";
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 import "./Verifier.sol";
 
 //import "./MintVerifier.sol";
@@ -10,9 +10,9 @@ import "./Verifier.sol";
 //import "./TransferVerifier.sol";
 
 struct character {
-  uint attribute1;
-  uint attribute2;
-  uint attribute3;
+    uint256 attribute1;
+    uint256 attribute2;
+    uint256 attribute3;
 }
 
 interface IVerifier {
@@ -54,7 +54,6 @@ interface IVerifier {
 
 contract ZkCards is MerkleTreeWithHistory {
     event Statue(uint256 id);
- 
 
     IVerifier public verifier;
 
@@ -72,7 +71,7 @@ contract ZkCards is MerkleTreeWithHistory {
 
     mapping(uint256 => bool) public nullifiers;
 
-    //mapping(uint256 => mapping(character => uint256)) public bids;
+    mapping(uint256 => mapping(uint256 => uint256)) public bids; //This will not work is attributes are == 10
 
     constructor(
         IVerifier _verifier,
@@ -133,8 +132,8 @@ contract ZkCards is MerkleTreeWithHistory {
         uint256 commitment = input[0];
         uint256 id = input[1];
 
-        emit Statue(id);
-        console.log(id);
+        //emit Statue(id);
+        //console.log(id);
         require(
             status[id] == 1,
             "Only minted and unshielded tokens can be shielded"
@@ -202,6 +201,32 @@ contract ZkCards is MerkleTreeWithHistory {
         commitments[newCommitment] = true;
     }
 
+    function makeBid(
+        uint256 pubKey,
+        uint256 attribute1,
+        uint256 attribute2,
+        uint256 attribute3
+    ) public payable {
+        //console.log(attribute1);
+        require(int(attribute1) <= 10, "Greater than 10");
+        require(attribute1 >= 0, "Smaller than 0");
+        require(attribute2 <= 10, "Greater than 10");
+        require(attribute2 >= 0, "Smaller than 0");
+        require(attribute3 <= 10, "Greater than 10");
+        require(attribute3 >= 0, "Smaller than 0");
+        //require(msg.sender.balance - msg.value > 0);
+        //msg.sender.balance -= msg.value;
+        //console.log("Sender's balance before sell");
+        //console.log(msg.sender.balance);
+        //console.log("Sender's balance after sell");
+        //console.log(msg.sender.balance);
+        //console.log("msg.value");
+        //console.log(msg.value);
+        bids[pubKey][attribute1 * 100 + attribute2 * 10 + attribute3] = msg.value;
+        // Should add the msg.value to a map of balances so that when the bidder wants to
+        // cancel the bid, she can get the msg.value refunded
+    }
+
     function sell(
         uint256[2] memory a,
         uint256[2][2] memory b,
@@ -215,7 +240,10 @@ contract ZkCards is MerkleTreeWithHistory {
         uint256 attribute1 = input[4];
         uint256 attribute2 = input[5];
         uint256 attribute3 = input[6];
+        uint256 total = attribute1 * 100 + attribute2 * 10 + attribute3;
+        uint256 amount = bids[pubKeyReceiver][total];
         // Check that pubKeyReceiver has made an ask and that the has not been matched yet.
+        //require(amount != 0);
 
         require(!nullifiers[nullifier], "Nullifier was already used");
 
@@ -232,5 +260,13 @@ contract ZkCards is MerkleTreeWithHistory {
         require(!commitments[newCommitment], "Commitment already exists");
         _insert(bytes32(newCommitment));
         commitments[newCommitment] = true;
+
+        //console.log("amount to be given to seller");
+        //console.log(amount);
+        bids[pubKeyReceiver][total] -= amount;
+        payable(msg.sender).transfer(amount);
+        //console.log("Sender of sell transaction");
+        //console.log(msg.sender);
+
     }
 }

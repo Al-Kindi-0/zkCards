@@ -1,38 +1,48 @@
 import { groth16 } from "snarkjs";
+//const bigInt = require('big-integer');
 
-function unstringifyBigInts(o) {
-  if (typeof o == "string" && /^[0-9]+$/.test(o)) {
-    return BigInt(o);
-  } else if (typeof o == "string" && /^0x[0-9a-fA-F]+$/.test(o)) {
-    return BigInt(o);
-  } else if (Array.isArray(o)) {
-    return o.map(unstringifyBigInts);
-  } else if (typeof o == "object") {
-    if (o === null) return null;
-    const res = {};
-    const keys = Object.keys(o);
-    keys.forEach((k) => {
-      res[k] = unstringifyBigInts(o[k]);
-    });
-    return res;
-  } else {
-    return o;
-  }
+
+/*
+const unstringifyBigInts = (o) => {
+    if ((typeof(o) == "string") && (/^[0-9]+$/.test(o) ))  {
+        return bigInt(o)
+    } else if (Array.isArray(o)) {
+        return o.map(unstringifyBigInts)
+    } else if (typeof o == "object") {
+        const res = {}
+        for (let k in o) {
+            res[k] = unstringifyBigInts(o[k])
+        }
+        return res
+    } else {
+        return o
+    }
 }
+*/
 
+/* global BigInt */
 export async function exportCallDataGroth16(input, wasmPath, zkeyPath) {
+  
   const { proof, publicSignals } = await groth16.fullProve(
     input,
     wasmPath,
     zkeyPath
   );
+  //console.log("right after fullProve")
+  //console.log(proof);
+  //console.log(publicSignals);
 
-  const editedPublicSignals = unstringifyBigInts(publicSignals);
-  const editedProof = unstringifyBigInts(proof);
+  const editedPublicSignals = publicSignals;//unstringifyBigInts(publicSignals);
+  const editedProof = proof;//unstringifyBigInts(proof);
+
+  //console.log(editedProof);
+
   const calldata = await groth16.exportSolidityCallData(
     editedProof,
     editedPublicSignals
   );
+  console.log(calldata);
+  console.log(calldata[0]);
 
   const argv = calldata
     .replace(/["[\]\s]/g, "")
@@ -51,5 +61,6 @@ export async function exportCallDataGroth16(input, wasmPath, zkeyPath) {
     Input.push(argv[i]);
   }
 
+  console.log([a, b, c, Input]);
   return [a, b, c, Input];
 }

@@ -6,10 +6,8 @@ async function main() {
 
     //const provider = providers.getDefaultProvider(network);
 
-    //const [signer, signer2] = await hre.ethers.getSigners();
-    
-    let provider = new ethers.providers.InfuraProvider("goerli", "472154f64c7144f7853594f0b401a43e");
-    var signer = new ethers.Wallet(process.env.REACT_APP_PRIVAT_KEY, provider);
+    const [signer, signer2] = await hre.ethers.getSigners();
+
 
     
 

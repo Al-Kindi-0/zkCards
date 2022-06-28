@@ -22,20 +22,23 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: {
-    compilers: [{ version: "0.7.6" },{ version: "0.8.15" }, { version: "0.6.7" }]
+    compilers: [{ version: "0.7.6" }, { version: "0.8.15" }, { version: "0.6.7" }]
   },
   circom: {
     ptau: "pot15_final.ptau",
     circuits:
       [{ name: "mint" }, { name: "unshield" }, { name: "transfer" }, { name: "shield" }, { name: "sell" }]
     //[{ name: "transfer" }]
-  }, 
-  
+  },
+
   networks: {
     goerli: {
-    url: process.env.REACT_APP_GO_RPC_URL,
-    accounts: [process.env.REACT_APP_PRIVAT_KEY]
-    }
+      url: process.env.REACT_APP_GO_RPC_URL,
+      accounts: [process.env.REACT_APP_PRIVAT_KEY]
+    },
+    hardhat: {
+      //chainId: 31377
+    },
   },
   etherscan: {
     apiKey: process.env.REACT_APP_ETH_SCAN_URL,

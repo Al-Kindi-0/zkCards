@@ -80,8 +80,8 @@ async function main() {
 
   let newSecret = 21;
   let pubKeyReceiver = poseidon([newSecret]).toString();
-  //console.log("pubkey");
-  //console.log(pubKeyReceiver)
+  console.log("pubkey");
+  console.log(pubKeyReceiver)
   const transfer = {
     id: hashedId1,
     root: tree.root(),
@@ -175,7 +175,8 @@ async function main() {
   tree.insert(newCommitment)
   fs.writeJsonSync(path.resolve(circuitsDir, "transfer2.input.json"), transfer2);
 
-
+console.log('commitement before last unshield')
+console.log(newCommitment)
 // Unshield the note
 const unshield2 = {
   id: transfer2.id,
@@ -190,7 +191,8 @@ const unshield2 = {
 fs.writeJsonSync(path.resolve(circuitsDir, "unshield2.input.json"), unshield2);
 fs.writeJsonSync(path.resolve(circuitsDir, "unshield2.json"), unshield2);
 
-
+console.log("pubkey");
+console.log(pubKeyReceiver)
 }
 
 

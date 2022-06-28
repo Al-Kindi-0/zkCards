@@ -21,7 +21,7 @@ const unstringifyBigInts = (o) => {
 */
 
 /* global BigInt */
-export async function exportCallDataGroth16(input, wasmPath, zkeyPath) {
+async function exportCallDataGroth16(input, wasmPath, zkeyPath) {
   
   const { proof, publicSignals } = await groth16.fullProve(
     input,
@@ -63,4 +63,40 @@ export async function exportCallDataGroth16(input, wasmPath, zkeyPath) {
 
   console.log([a, b, c, Input]);
   return [a, b, c, Input];
+}
+//const bigInt = require('big-integer');
+//const path = require("path");
+
+
+//const circuitsDir = path.resolve(__dirname, "circuits");pubKeyReceiver
+
+
+async function transferCalldata(shieldId, root, secretKey,pubKey, path_elements, path_indices) {
+  
+  
+  const input =
+  {
+    id: shieldId,
+    root: root,
+    secret: secretKey,
+    pubKeyReceiver: pubKey,
+    pathElements: path_elements,
+    pathIndices: path_indices
+  };
+  
+  //const input = { attribute1: 2, attribute2: 4, attribute3: 1, hashKey: 55};
+  let dataResult;
+
+  try {
+    dataResult = await exportCallDataGroth16(
+      input,
+      "./src/zkProofs/transfer/transfer.wasm",
+      "./src/zkProofs/transfer/transfer.zkey"
+    );
+  } catch (error) {
+    console.log(error);
+    //window.alert("Wrong answer");
+  }
+
+  return dataResult;
 }

@@ -1,4 +1,4 @@
-import { exportCallDataGroth16 } from "../exportCallData";
+const { exportCallDataGroth16 } = require("../exportCallData");
 //const bigInt = require('big-integer');
 //const path = require("path");
 
@@ -35,3 +35,4 @@ export async function transferCalldata(shieldId, root, secretKey,pubKey, path_el
 
   return dataResult;
 }
+

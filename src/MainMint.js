@@ -10,25 +10,25 @@ const poseidon = require("circomlibjs").poseidon;
 const mimcsponge = require("circomlibjs").mimcsponge;
 const Tree = require("fixed-merkle-tree");
 
-//const zkCardsAddress = "0x2de4270093D550F5bAFe462A583eC0b712796aAd";
-const zkCardsAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+const zkCardsAddress = "0x3f75d6Ebd665BA46339ea06c9bC7c2be815F6Fc3";
+//const zkCardsAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 const { BigNumber, BigNumberish } = require("ethers");
 
 
-const MERKLE_TREE_HEIGHT = 3;
+const MERKLE_TREE_HEIGHT = 10;
 
 //const {transferCalldata} = require('./callDataFunctions.js')
 
 const { groth16 } = require("snarkjs");
-//var Web3 = require('web3');
-//var web3 = new Web3();
+var Web3 = require('web3');
+var web3 = new Web3();
 /* global BigInt */
 const MainMint = ({ accounts, setAccounts }) => {
     //const [mintAmount, setMintAmount] = useState(1);
     const [attribute1, setAttribute1] = useState(1);
     const [attribute2, setAttribute2] = useState(1);
     const [attribute3, setAttribute3] = useState(1);
-    const [hashKey, setHashKey] = useState(1);
+    const [hashKey, setHashKey] = useState("");
 
     const isConnected = Boolean(accounts[0]);
 
@@ -44,6 +44,14 @@ const MainMint = ({ accounts, setAccounts }) => {
             );
             try {
                 //const response = await contract.mint(BigNumber(mintAmount));
+                console.log("attribute1")
+                console.log(attribute1)
+                console.log("attribute2")
+                console.log(attribute2)
+                console.log("attribute3")
+                console.log(attribute3)
+                console.log("hashKey")
+                console.log(hashKey)
                 const callD = await mintCalldata(attribute1, attribute2, attribute3, hashKey);
                 //const callD = "let there";
                 console.log(callD);
@@ -71,7 +79,8 @@ const MainMint = ({ accounts, setAccounts }) => {
                 //const response = await contract.mint(BigNumber(mintAmount));
                 const callD = await [toFixedHex(pubKey_New), toFixedHex(attribute1), toFixedHex(attribute2), toFixedHex(attribute3)];
                 //const callD = "let there";
-                const options = { value: ethers.utils.parseEther(bidValue.toString()) }
+                const options = { value: ethers.utils.parseEther(number_float.toString()) }
+                console.log(options)
                 console.log(callD);
                 console.log("Call Data");
                 console.log(callD);
@@ -277,7 +286,7 @@ const MainMint = ({ accounts, setAccounts }) => {
                     id: shield.id,
                     root: tree.root(),
                     secret: shield.secret,
-                    pubKeyReceiver: pubKey.toString(),
+                    pubKeyReceiver: pubKey_receiver_sell,
                     pathElements: tree.path(index).pathElements.map(x => x.toString()),
                     pathIndices: tree.path(index).pathIndices.map(x => x.toString())
                 };
@@ -305,8 +314,15 @@ const MainMint = ({ accounts, setAccounts }) => {
     }
     async function handlePubKey() {
         setGeneratedPubKey(poseidon([secretKey_New]).toString());
-
     }
+    async function handleSecretKeyGeneration() {
+        setValueSecretKey_New(web3.eth.abi.decodeParameter("uint256", web3.utils.randomHex(32)))
+    }
+    async function handleHashKeyGeneration() {
+        // setHashKey(web3.utils.randomHex(12))
+        setHashKey(web3.eth.abi.decodeParameter("uint256", web3.utils.randomHex(32)))
+    }
+    
     async function handleSell() {
         if (window.ethereum) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -348,25 +364,49 @@ const MainMint = ({ accounts, setAccounts }) => {
                 };
                 let pubKey = poseidon([shield.secret]).toString();
                 let commitment = poseidon([shield.id, pubKey]).toString();
-                //console.log(commitment);
+                console.log(commitment);
+                function toFixedHex(number, length = 32) {
+                    let result =
+                        '0x' +
+                        (number instanceof Buffer
+                            ? number.toString('hex')
+                            : BigNumber.from(number).toHexString().replace('0x', '')
+                        ).padStart(length * 2, '0')
+                    if (result.indexOf('-') > -1) {
+                        result = '-' + result.replace('-', '')
+                    }
+                    return result
+                }
 
+
+                console.log("Address seller")
+                console.log(address.toString(16))
+                console.log(toFixedHex(address, 16))
+
+                console.log("Pub key receiver")
+                console.log(pubKey)
+
+                console.log("Merkle tree")
+                console.log(Tree.leaves)
                 // Find the index of the commitment in the Merkle tree
                 let index = tree.indexOf(toFixedHex(commitment))
-                //console.log("Index of commitment")
-                //console.log(index)
+                console.log("Index of commitment")
+                console.log(index)
 
                 const input_sell =
                 {
+                    address: address.toString(16),
                     id: shield.id,
                     root: tree.root(),
                     secret: shield.secret,
-                    pubKeyReceiver: pubKey,
+                    pubKeyReceiver: pubKey_receiver_sell,
                     pathElements: tree.path(index).pathElements.map(x => x.toString()),
                     pathIndices: tree.path(index).pathIndices.map(x => x.toString())
                 };
-                //console.log(input_transfer)
+                console.log("Address seller")
+                console.log(input_sell.address)
 
-                let calData = await sellCalldata(input_sell.id, input_sell.root, input_sell.secret, input_sell.pubKeyReceiver, input_sell.pathElements, input_sell.pathIndices, attribute1, attribute2, attribute3, hashKey)
+                let calData = await sellCalldata(input_sell.address, input_sell.id, input_sell.root, input_sell.secret, input_sell.pubKeyReceiver, input_sell.pathElements, input_sell.pathIndices, attribute1, attribute2, attribute3, hashKey)
 
                 console.log(calData)
 
@@ -460,8 +500,8 @@ const MainMint = ({ accounts, setAccounts }) => {
     const [path_indices, setValuePath_indices] = useState('');
 
     const handleChangeAddress = event => {
-        const result = event.target.value.replace(/\D/g, '');
-
+        //const result = event.target.value.replace(/\D/g, '');
+        const result = event.target.value
         setValueAddress(result);
     }
 
@@ -484,7 +524,8 @@ const MainMint = ({ accounts, setAccounts }) => {
     // Transfer logic
     const [pubKey, setValuePubKey] = useState('');
     const handleChangePubKey = event => {
-        const result = event.target.value.replace(/\D/g, '');
+        //const result = event.target.value.replace(/\D/g, '');
+        const result = event.target.value;
 
         setValuePubKey(result);
     }
@@ -522,10 +563,11 @@ const MainMint = ({ accounts, setAccounts }) => {
 
     // Bid logic
     const [pubKey_New, setPubKey_new] = useState('');
-    const [bidValue, setBidValue] = useState('');
+    const [bidValue, setBidValue] = useState(0);
 
     const handleChangePubKey_New = event => {
         const result = event.target.value.replace(/\D/g, '');
+        //const result = event.target.value
 
         setPubKey_new(result);
     }
@@ -535,7 +577,42 @@ const MainMint = ({ accounts, setAccounts }) => {
         setBidValue(result);
     }
 
+    //
+    const handleChangeHashKey_new = event => {
+        const result = event.target.value.replace(/\D/g, '');
 
+        setHashKey(result);
+    }
+
+    //
+
+    const [number_float, setNumber_float] = useState('')
+
+    const handleNumber = (e) => {
+
+        let input = e.target.value
+
+        if (input.match(/^([0-9]{1,})?(\.)?([0-9]{1,})?$/))
+            setNumber_float(input)
+
+    }
+
+    const handleFloat = () => {
+
+        // The conditional prevents parseFloat(null) = NaN (when the user deletes the input)
+        setNumber_float(parseFloat(number_float) || '')
+
+    }
+
+    const [pubKey_receiver_sell, set_pubKey_receiver_sell] = useState('');
+
+
+    const handleChangePubKey_receiver_sell = event => {
+        const result = event.target.value.replace(/\D/g, '');
+        //const result = event.target.value
+
+        set_pubKey_receiver_sell(result);
+    }
 
     return (
         <div>
@@ -544,8 +621,16 @@ const MainMint = ({ accounts, setAccounts }) => {
             {isConnected ? (
                 <div>
                     <div>
+                        <h1>Generate a Secret Hash Key</h1>
+                        <p>This is the secret that proves your ownership of the zkCard</p>
+                        <button onClick={handleHashKeyGeneration}>Generate Secret Hash Key </button>
+                        <p>{hashKey}</p>
+                    </div>
+
+                    <div>
                         <h1>Mint your zkCard</h1>
                         <p>Select the combination of attributes that you would like to mint</p>
+                        <p>Use the button above to generate a secret hash key and then copy it to the 4th box bellow</p>
                         <div>
                             <button onClick={handleDecrement1}>-</button>
                             <input type="number" value={attribute1} />
@@ -563,11 +648,37 @@ const MainMint = ({ accounts, setAccounts }) => {
                             <button onClick={handleIncrement3}>+</button>
                         </div>
                         <div>
-                            <button onClick={handleDecrementHash}>-</button>
-                            <input type="number" value={hashKey} />
-                            <button onClick={handleIncrementHash}>+</button>
+                            <input
+                                type="number"
+                                placeholder="Your secret Hash Key"
+                                value={hashKey}
+                                onChange={handleChangeHashKey_new}
+                            />
                         </div>
                         <button onClick={handleMint}>Mint Now</button>
+                    </div>
+
+
+                    <div>
+                        <h1>Generate a Secret Key</h1>
+                        <button onClick={handleSecretKeyGeneration}>Generate Secret Key </button>
+                        <p>{secretKey_New}</p>
+                    </div>
+
+                    <div>
+                        <h1>Create a Public Key</h1>
+                        <p>Generate a secret number using the button above and then copy/paste it bellow to generate your public key</p>
+                        <div>
+                            <input
+                                type="number"
+                                placeholder="Secret key"
+                                value={secretKey_New}
+                                onChange={handleChangeSecretKey_New}
+                            />
+                        </div>
+
+                        <button onClick={handlePubKey}>Generate Public Key </button>
+                        <p>{generated_pub_key}</p>
                     </div>
 
                     <div>
@@ -598,13 +709,8 @@ const MainMint = ({ accounts, setAccounts }) => {
                                 onChange={handleChangePubKey_New}
                             />
                         </div>
-
                         <div>
-                            <input
-                                type="number"
-                                placeholder="Your bid value"
-                                value={bidValue}
-                                onChange={handleChangeBidValue}
+                            <input placeholder='Enter bid amount' value={number_float} onChange={handleNumber} onBlur={handleFloat}
                             />
                         </div>
 
@@ -642,21 +748,6 @@ const MainMint = ({ accounts, setAccounts }) => {
                         <button onClick={handleCancelBid}>Cancel Bid Now</button>
                     </div>
 
-                    <div>
-                        <h1>Create a Public Key</h1>
-                        <p>Enter a secret number</p>
-                        <div>
-                            <input
-                                type="number"
-                                placeholder="Secret key"
-                                value={secretKey_New}
-                                onChange={handleChangeSecretKey_New}
-                            />
-                        </div>
-
-                        <button onClick={handlePubKey}>Generate Public Key </button>
-                        <p>{generated_pub_key}</p>
-                    </div>
 
                     <div>
                         <h1>Shield your zkCard</h1>
@@ -678,9 +769,12 @@ const MainMint = ({ accounts, setAccounts }) => {
                             <button onClick={handleIncrement3}>+</button>
                         </div>
                         <div>
-                            <button onClick={handleDecrementHash}>-</button>
-                            <input type="number" value={hashKey} />
-                            <button onClick={handleIncrementHash}>+</button>
+                            <input
+                                type="number"
+                                placeholder="Your secret Hash Key"
+                                value={hashKey}
+                                onChange={handleChangeHashKey_new}
+                            />
                         </div>
 
                         <div>
@@ -714,9 +808,12 @@ const MainMint = ({ accounts, setAccounts }) => {
                             <button onClick={handleIncrement3}>+</button>
                         </div>
                         <div>
-                            <button onClick={handleDecrementHash}>-</button>
-                            <input type="number" value={hashKey} />
-                            <button onClick={handleIncrementHash}>+</button>
+                            <input
+                                type="number"
+                                placeholder="Your secret Hash Key"
+                                value={hashKey}
+                                onChange={handleChangeHashKey_new}
+                            />
                         </div>
 
                         <div>
@@ -760,9 +857,12 @@ const MainMint = ({ accounts, setAccounts }) => {
                             <button onClick={handleIncrement3}>+</button>
                         </div>
                         <div>
-                            <button onClick={handleDecrementHash}>-</button>
-                            <input type="number" value={hashKey} />
-                            <button onClick={handleIncrementHash}>+</button>
+                            <input
+                                type="number"
+                                placeholder="Your secret Hash Key"
+                                value={hashKey}
+                                onChange={handleChangeHashKey_new}
+                            />
                         </div>
                         <div>
                             <input
@@ -776,8 +876,8 @@ const MainMint = ({ accounts, setAccounts }) => {
                             <input
                                 type="text"
                                 placeholder="Public key of receiver"
-                                value={pubKey}
-                                onChange={handleChangePubKey}
+                                value={pubKey_receiver_sell}
+                                onChange={handleChangePubKey_receiver_sell}
                             />
                         </div>
 
@@ -787,6 +887,14 @@ const MainMint = ({ accounts, setAccounts }) => {
                     <div>
                         <h1>Sell your zkCard</h1>
                         <p>Enter the following in order to sell your zkCard to a public bid:</p>
+                        <div>
+                            <input
+                                type="text"
+                                placeholder="Address (current one)"
+                                value={address}
+                                onChange={handleChangeAddress}
+                            />
+                        </div>
 
                         <div>
                             <input
@@ -800,8 +908,8 @@ const MainMint = ({ accounts, setAccounts }) => {
                             <input
                                 type="text"
                                 placeholder="Public key of receiver"
-                                value={pubKey}
-                                onChange={handleChangePubKey}
+                                value={pubKey_receiver_sell}
+                                onChange={handleChangePubKey_receiver_sell}
                             />
                         </div>
 
@@ -831,10 +939,10 @@ const MainMint = ({ accounts, setAccounts }) => {
                         </div>
                         <div>
                             <input
-                                type="text"
-                                placeholder="Hash Key used when minting"
+                                type="number"
+                                placeholder="Your secret Hash Key"
                                 value={hashKey}
-                                onChange={handleChangeHashKey}
+                                onChange={handleChangeHashKey_new}
                             />
                         </div>
 

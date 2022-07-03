@@ -11,7 +11,7 @@ async function main() {
     let provider = new ethers.providers.InfuraProvider("goerli", "472154f64c7144f7853594f0b401a43e");
     var signer = new ethers.Wallet(process.env.REACT_APP_PRIVAT_KEY, provider);
 
-    
+    const MERKLE_TREE_HEIGHT = 10;
 
     const HasherFactory = new hre.ethers.ContractFactory(Hasher.abi, Hasher.bytecode, signer);
     const hasher = await HasherFactory.deploy();
@@ -21,7 +21,7 @@ async function main() {
     await verifier.deployed();
 
     const ZkCards = await hre.ethers.getContractFactory("ZkCards");
-    const zkCards = await ZkCards.deploy(verifier.address, 3, hasher.address);
+    const zkCards = await ZkCards.deploy(verifier.address, MERKLE_TREE_HEIGHT, hasher.address);
     await zkCards.deployed();
 
 

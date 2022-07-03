@@ -48,7 +48,7 @@ interface IVerifier {
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[7] memory input
+        uint256[8] memory input
     ) external returns (bool);
 }
 
@@ -65,6 +65,13 @@ contract ZkCards is MerkleTreeWithHistory {
         uint256 attribute1,
         uint256 attribute2,
         uint256 attribute3
+    );
+    event BidCancelled(
+        uint256 pubKey,
+        uint256 attribute1,
+        uint256 attribute2,
+        uint256 attribute3
+
     );
 
     IVerifier public verifier;
@@ -218,17 +225,19 @@ contract ZkCards is MerkleTreeWithHistory {
         require(attribute2 > 0, "Smaller than 0");
         require(attribute3 < 10, "Greater than 10");
         require(attribute3 > 0, "Smaller than 0");
+        require(attribute1 + attribute2 + attribute3 <= 10 , "Sum of attributes can't be larger than 10");
 
         publicKeys[msg.sender] = pubKey;
         bids[pubKey][attribute1 * 100 + attribute2 * 10 + attribute3] = msg
             .value;
+        emit NewBid(pubKey, attribute1, attribute2, attribute3);
     }
 
     function sell(
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[7] memory input
+        uint256[8] memory input
     ) public {
         uint256 nullifier = input[0];
         uint256 newCommitment = input[1];
@@ -240,7 +249,11 @@ contract ZkCards is MerkleTreeWithHistory {
         uint256 total = attribute1 * 100 + attribute2 * 10 + attribute3;
         uint256 amount = bids[pubKeyReceiver][total];
 
-        require(amount != 0);
+        address owner = address(uint160(input[7]));
+        //console.log(owner);
+        require(owner == msg.sender, "Not owner");
+
+        require(amount != 0, "amount must be non zero");
 
         require(!nullifiers[nullifier], "Nullifier was already used");
 
@@ -276,6 +289,7 @@ contract ZkCards is MerkleTreeWithHistory {
         require(attribute2 > 0, "Smaller than 0");
         require(attribute3 < 10, "Greater than 10");
         require(attribute3 > 0, "Smaller than 0");
+        require(attribute1 + attribute2 + attribute3 <= 10 , "Sum of attributes can't be larger than 10");
         require(publicKeys[msg.sender] == pubKey);
         uint256 amount = bids[pubKey][
             attribute1 * 100 + attribute2 * 10 + attribute3
@@ -284,5 +298,6 @@ contract ZkCards is MerkleTreeWithHistory {
         require(amount != 0, "Balance is empty");
         bids[pubKey][attribute1 * 100 + attribute2 * 10 + attribute3] = 0;
         payable(msg.sender).transfer(amount);
+        emit BidCancelled(pubKey, attribute1, attribute2, attribute3);
     }
 }

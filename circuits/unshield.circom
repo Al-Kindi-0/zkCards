@@ -36,6 +36,9 @@ template unshield(levels) {
     nullifierHasher.ins[1] <== secret;
     nullifierHasher.k <== 0;
     nullifier <== nullifierHasher.outs[0];
+
+    signal square;
+    square <== address * address;
 }
 
 

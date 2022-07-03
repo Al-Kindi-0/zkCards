@@ -1,9 +1,10 @@
 import { exportCallDataGroth16 } from "../exportCallData";
 
-export async function sellCalldata(shieldId, root, secretKey, pubKey, path_elements, path_indices, attribute1, attribute2, attribute3, hashKey) {
+export async function sellCalldata(address, shieldId, root, secretKey, pubKey, path_elements, path_indices, attribute1, attribute2, attribute3, hashKey) {
 
   const input =
   {
+    address: address,
     id: shieldId,
     root: root,
     secret: secretKey,

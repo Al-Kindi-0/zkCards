@@ -17,7 +17,7 @@ template sell(levels) {
     signal input attribute2;
     signal input attribute3;
     signal input hashKey;
-    //signal input ownAddress; // Needed to stop front-running 
+    signal input address; // Needed to stop front-running 
     signal output nullifier;
     signal output newCommitment;
 
@@ -69,7 +69,11 @@ template sell(levels) {
     nullifierHasher.ins[1] <== secret;
     nullifierHasher.k <== 0;
     nullifier <== nullifierHasher.outs[0];
+
+    signal square;
+
+    square <== address * address;
 }
 
 
-component main {public [root, pubKeyReceiver, attribute1, attribute2, attribute3]}= sell(3);
+component main {public [address, root, pubKeyReceiver, attribute1, attribute2, attribute3]}= sell(3);

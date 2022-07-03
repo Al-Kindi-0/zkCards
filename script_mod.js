@@ -41,7 +41,7 @@ async function main() {
     const MERKLE_TREE_HEIGHT = 3;
 
     const provider = waffle.provider;
-    const [signer, signer2, signer3] = await ethers.getSigners();
+    const [signer, signer2, signer3, signer4] = await ethers.getSigners();
 
     const HasherFactory = new ethers.ContractFactory(Hasher.abi, Hasher.bytecode, signer);
     const hasher = await HasherFactory.deploy();
@@ -280,6 +280,7 @@ async function main() {
 
     const input_sell =
     {
+        address: signer4.address.toString(),
         id: shield2.id,
         root: tree.root(),
         secret: shield2.secret,
@@ -287,19 +288,22 @@ async function main() {
         pathElements: tree.path(index).pathElements.map(x => x.toString()),
         pathIndices: tree.path(index).pathIndices.map(x => x.toString())
     };
-    //console.log(input_sell)
+    console.log("Address seller")
+    console.log(input_sell.address)
 
-    callD = await sellCalldata(input_sell.id, input_sell.root, input_sell.secret, input_sell.pubKeyReceiver, input_sell.pathElements, input_sell.pathIndices, card2.attribute1, card2.attribute2, card2.attribute3, card2.hashKey)
+    callD = await sellCalldata(input_sell.address, input_sell.id, input_sell.root, input_sell.secret, input_sell.pubKeyReceiver, input_sell.pathElements, input_sell.pathIndices, card2.attribute1, card2.attribute2, card2.attribute3, card2.hashKey)
 
 
     console.log("Sell token 2");
     //console.log(sellArgs[3][0]);
     //await zkCards.sell(...sellArgs);
-    await zkCards.sell(...callD);
+    console.log(input_sell.address)
+    let response = await zkCards.connect(signer4).sell(...callD);
+    console.log(response.address)
     //await printOwnerOf(sellArgs[3][3]);
     //sellArgs[3][3] is the pubKey of the buyer i.e. new owner
 
-    //////////////////////////////////////////////// transfer Card2 so as we re-shield it 
+    //////////////////////////////////////////////// transfer Card2 so as we can re-shield it 
     // Locate the commitment corresponding to the card that we bought in the previous step
     // The attributes are public at this point and the the pubkeyReceiver is our own
     const newId = mimcsponge.multiHash([card2.attribute1, card2.attribute2, card2.attribute3, input_sell.pubKeyReceiver].map((x) => BigNumber.from(x).toBigInt())).toString();
@@ -320,6 +324,8 @@ async function main() {
     // New public address that we will transfer to when re-shielding
     let secret3 = 3393984;
     let pubKeyReceiver3 = poseidon([secret3]).toString();
+    console.log("Pubkey receiver 3")
+    console.log(pubKeyReceiver3)
 
     const input_transfer2 =
     {
@@ -417,6 +423,21 @@ async function main() {
     await zkCards.connect(signer3).cancel(...bidArgs);
     balanceInWei4 = await provider.getBalance(signer3.address);
     console.log(ethers.utils.formatEther(balanceInWei4));
+
+    
+        const filter_new = zkCards.filters.NewBid();
+        const filter_accepted = zkCards.filters.BidAccepted();
+        const filter_cancelled = zkCards.filters.BidCancelled();
+
+        const events_new = await zkCards.queryFilter(filter_new, 0)
+        const events_accepted = await zkCards.queryFilter(filter_accepted, 0)
+        const events_cancelled = await zkCards.queryFilter(filter_cancelled, 0)
+        
+        //const filtered = events_new.filter((a) => a.args.value && )
+
+        //    const leaves = events.sort((a, b) => a.args.index - b.args.index).map((e) => toFixedHex(e.args.commitment))
+
+        console.log(events_accepted)
 }
 
 main()
@@ -573,10 +594,11 @@ async function transferCalldata(shieldId, root, secretKey, pubKey, path_elements
 
     return dataResult;
 }
-async function sellCalldata(shieldId, root, secretKey, pubKey, path_elements, path_indices, attribute1, attribute2, attribute3, hashKey) {
+async function sellCalldata(address, shieldId, root, secretKey, pubKey, path_elements, path_indices, attribute1, attribute2, attribute3, hashKey) {
 
     const input =
     {
+        address: address,
         id: shieldId,
         root: root,
         secret: secretKey,

@@ -4,9 +4,11 @@ It is worth emphasizing that zk-SNARK techniques are used in two ways. The first
 The second way we use zk-SNARK techniques is in shielding the attributes, using both the private minting circuit for newly created zkCards as well as shielded transfers using the transfer circuit, and thus creating a dynamic where the market price of zkCards can't be determined based on a supply-and-demand dynamics but is determined based on other factors related to the design of the zkCard universe e.g. the games might favor certain attributes over others at later stages of the games and thus zkCards that where minted cheaply in the beginning might become very valuable later.
 
 
-<!-- The project is currently on [Goerli Testnet](https://goerli.etherscan.io/address/0x890C5063f7897c8FE9AfC8e37833BB4Bf3987Df0#code) -->
+<!-- The project is currently on [Matic Mainnet](https://polygonscan.com/address/0x2b14444b5bc4549e080e03a92748b00fe7287745#code) -->
 
-The project is currently on [Goerli Mainnet](https://goerli.etherscan.io/address/0x890C5063f7897c8FE9AfC8e37833BB4Bf3987Df0#code) .
+The project is currently on [Matic Mainnet](https://polygonscan.com/address/0x2b14444b5bc4549e080e03a92748b00fe7287745#code) .
+
+The UI is hosted using Netlify at https://62c1c7f131de8d32d953bda7--voluble-panda-d278ad.netlify.app/
 
 
 

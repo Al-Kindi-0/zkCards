@@ -42,4 +42,4 @@ template unshield(levels) {
 }
 
 
-component main {public [id, address, root]}= unshield(3);
+component main {public [id, address, root]}= unshield(10);

@@ -11,7 +11,7 @@ const { BigNumber, BigNumberish, ethers } = require("ethers");
 const circuitsDir = path.resolve(__dirname, "circuits");
 
 async function main() {
-  const tree = new Tree(3);
+  const tree = new Tree(10);
   //console.log(poseidon([1,2,0,0,0]));
   //console.log(tree)
 

@@ -38,7 +38,7 @@ const { groth16 } = require("snarkjs");
 
 async function main() {
     //console.log(process.env.REACT_APP_GO_RPC_URL);
-    const MERKLE_TREE_HEIGHT = 3;
+    const MERKLE_TREE_HEIGHT = 10;
 
     const provider = waffle.provider;
     const [signer, signer2, signer3, signer4] = await ethers.getSigners();

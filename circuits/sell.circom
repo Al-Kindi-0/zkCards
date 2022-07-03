@@ -76,4 +76,4 @@ template sell(levels) {
 }
 
 
-component main {public [address, root, pubKeyReceiver, attribute1, attribute2, attribute3]}= sell(3);
+component main {public [address, root, pubKeyReceiver, attribute1, attribute2, attribute3]}= sell(10);

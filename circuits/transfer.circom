@@ -44,4 +44,4 @@ template transfer(levels) {
 }
 
 
-component main {public [root]}= transfer(3);
+component main {public [root]}= transfer(10);

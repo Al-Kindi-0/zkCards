@@ -5387,7 +5387,7 @@
 
 "circomlib@git+https://github.com/tornadocash/circomlib.git#5beb6aee94923052faeecea40135d45b6ce6172c":
   "integrity" "sha512-oZe9n08O5Zz032Wnn1KI3sWXtUmwTW5qNzNSIGNh5R2IlBBcbc9mvjquwUErd4rDzgusRck36qf/tz5VABOrUQ=="
-  "resolved" "git+ssh://git@github.com/tornadocash/circomlib.git#5beb6aee94923052faeecea40135d45b6ce6172c"
+  "resolved" "https://github.com/tornadocash/circomlib.git#5beb6aee94923052faeecea40135d45b6ce6172c"
   "version" "0.0.20"
   dependencies:
     "blake-hash" "^1.1.0"
@@ -15732,7 +15732,7 @@
 
 "snarkjs@git+https://github.com/tornadocash/snarkjs.git#869181cfaf7526fe8972073d31655493a04326d5":
   "integrity" "sha512-nUtDuGkO7MrsKwzjc5Hg83O0XM7+HQmRFsK8zobEsmRCL+W7Q/BiSinmZq2T5/DrhhvnABEHa7/ntViWeX1Vqw=="
-  "resolved" "git+ssh://git@github.com/tornadocash/snarkjs.git#869181cfaf7526fe8972073d31655493a04326d5"
+  "resolved" "https://github.com/tornadocash/snarkjs.git#869181cfaf7526fe8972073d31655493a04326d5"
   "version" "0.1.20"
   dependencies:
     "big-integer" "^1.6.43"

@@ -10,7 +10,7 @@ const poseidon = require("circomlibjs").poseidon;
 const mimcsponge = require("circomlibjs").mimcsponge;
 const Tree = require("fixed-merkle-tree");
 
-const zkCardsAddress = "0x3f75d6Ebd665BA46339ea06c9bC7c2be815F6Fc3";
+const zkCardsAddress = "0x8BD34842aDDdAFD9a5102e2111b790DeE3F0Acae";
 //const zkCardsAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 const { BigNumber, BigNumberish } = require("ethers");
 
@@ -364,6 +364,10 @@ const MainMint = ({ accounts, setAccounts }) => {
                 };
                 let pubKey = poseidon([shield.secret]).toString();
                 let commitment = poseidon([shield.id, pubKey]).toString();
+                console.log("secret used to generate pub")
+                console.log(shield.secret)
+                console.log("Resulting pubKey")
+                console.log(pubKey)
                 console.log(commitment);
                 function toFixedHex(number, length = 32) {
                     let result =
@@ -384,7 +388,7 @@ const MainMint = ({ accounts, setAccounts }) => {
                 console.log(toFixedHex(address, 16))
 
                 console.log("Pub key receiver")
-                console.log(pubKey)
+                console.log(pubKey_receiver_sell)
 
                 console.log("Merkle tree")
                 console.log(Tree.leaves)

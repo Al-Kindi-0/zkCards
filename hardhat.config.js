@@ -42,6 +42,10 @@ module.exports = {
       //chainId: 31377
     },
     testnet: { url: `https://api.s0.ps.hmny.io/`, accounts: [`0x${HARMONY_PRIVATE_KEY}`] },
+    matic_test: {
+      url: "https://rpc-mumbai.maticvigil.com",
+      accounts: [process.env.MATIC_TEST_PRIVATE_KEY]
+    }
   },
   etherscan: {
     apiKey: process.env.REACT_APP_ETH_SCAN_URL,

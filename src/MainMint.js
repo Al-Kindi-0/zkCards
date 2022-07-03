@@ -10,7 +10,7 @@ const poseidon = require("circomlibjs").poseidon;
 const mimcsponge = require("circomlibjs").mimcsponge;
 const Tree = require("fixed-merkle-tree");
 
-const zkCardsAddress = "0x890C5063f7897c8FE9AfC8e37833BB4Bf3987Df0";
+const zkCardsAddress = "0x2B14444B5BC4549E080E03a92748b00FE7287745";
 //const zkCardsAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 const { BigNumber, BigNumberish } = require("ethers");
 

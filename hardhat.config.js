@@ -45,6 +45,10 @@ module.exports = {
     matic_test: {
       url: "https://rpc-mumbai.maticvigil.com",
       accounts: [process.env.MATIC_TEST_PRIVATE_KEY]
+    },
+    matic_main: {
+      url: "https://polygon-rpc.com/",
+      accounts: [process.env.MATIC_MAIN_PRIVATE_KEY]
     }
   },
   etherscan: {
